@@ -15,12 +15,12 @@ resource "aws_vpc" "main" {
     vpc_id                     = aws_vpc.main.id
     cidr_block                 = "172.16.0.0/24"
     map_public_ip_on_launch    = true
-    availability_zone          = "eu-central-1a"
+    availability_zone          = "us-east-1"
 }
 # Create public subnet2
     resource "aws_subnet" "public2" {
     vpc_id                     = aws_vpc.main.id
     cidr_block                 = "172.16.1.0/24"
     map_public_ip_on_launch    = true
-    availability_zone          = "eu-central-1b"
+    availability_zone          = "us-east-1"
 }
