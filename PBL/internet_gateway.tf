@@ -4,7 +4,7 @@ tags = merge(
     var.tags,
     {
       #Name = format("%s-%s!", aws_vpc.main.id,"IG")
-      Name = format("%s-%s!", "HRA","-Igw")
+      Name = format("%s-%s!", "HRA","Igw")
     } 
   )
 }
