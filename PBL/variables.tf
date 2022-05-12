@@ -24,3 +24,10 @@ variable "enable_classiclink" {
 variable "enable_classiclink_dns_support" {
     default = "false"
 }
+
+tags = {
+  Enviroment      = "development" 
+  Owner-Email     = "hectore@email.com"
+  Managed-By      = "Terraform"
+  Billing-Account = "1234567890"
+}
