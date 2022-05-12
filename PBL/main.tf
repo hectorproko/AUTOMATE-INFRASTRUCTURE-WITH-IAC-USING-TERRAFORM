@@ -37,7 +37,7 @@ resource "aws_subnet" "public" { #so if preffered is null the number of subnets 
   tags = merge(
     var.tags,
     {
-      Name = format("PublicSubnet-%s", count.index)
+      Name = format("PublicSubnet-%s", count.index + 1) #Inex starts with 0
     } 
   )
 
