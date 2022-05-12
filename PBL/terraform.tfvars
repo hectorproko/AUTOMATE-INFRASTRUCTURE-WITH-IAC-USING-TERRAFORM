@@ -5,3 +5,10 @@ enable_dns_hostnames = "true"
 enable_classiclink = "false" 
 enable_classiclink_dns_support = "false" 
 preferred_number_of_public_subnets = 2
+
+tags = {
+  Enviroment      = "development" 
+  Owner-Email     = "hectore@email.com"
+  Managed-By      = "Terraform"
+  Billing-Account = "1234567890"
+}
