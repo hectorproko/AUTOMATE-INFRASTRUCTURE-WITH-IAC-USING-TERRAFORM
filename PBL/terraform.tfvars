@@ -6,7 +6,7 @@ enable_classiclink = "false"
 enable_classiclink_dns_support = "false" 
 preferred_number_of_public_subnets = 2
 
-tags = {
+variable tags = {
   Enviroment      = "development" 
   Owner-Email     = "hectore@email.com"
   Managed-By      = "Terraform"
