@@ -14,6 +14,9 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames           = var.enable_dns_hostnames
   enable_classiclink             = var.enable_classiclink
   enable_classiclink_dns_support = var.enable_classiclink_dns_support
+  tags = {
+    Name = "HRA-VPC"
+  }
 }
 
 # Create public subnets
