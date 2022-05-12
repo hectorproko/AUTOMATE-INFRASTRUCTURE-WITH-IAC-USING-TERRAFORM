@@ -1,6 +1,10 @@
 variable "preferred_number_of_public_subnets" {
   default = null
 }
+
+variable "preferred_number_of_private_subnets" {
+  default = null
+}
 variable "region" {
     default = "us-east-1"
 }
