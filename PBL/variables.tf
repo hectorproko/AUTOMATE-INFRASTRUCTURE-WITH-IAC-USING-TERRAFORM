@@ -24,3 +24,9 @@ variable "enable_classiclink" {
 variable "enable_classiclink_dns_support" {
     default = "false"
 }
+
+variable "tags" {
+  description = "A mapping of tags to assign to all resources."
+  type        = map(string)
+  default     = {}
+}
