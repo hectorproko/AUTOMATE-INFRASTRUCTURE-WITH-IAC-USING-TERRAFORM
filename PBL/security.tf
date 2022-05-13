@@ -59,27 +59,33 @@ resource "aws_security_group" "bastion_sg" {
 resource "aws_security_group" "nginx-sg" {
   name   = format("%s-nginx-reverse-proxy", var.name)
   vpc_id = aws_vpc.main.id
-
-    ingress {
-        description = "HTTP"
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        source_security_group_id = aws_security_group.ext-alb-sg.id
-
-    }
     egress {
         from_port   = 0
         to_port     = 0
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
-tags = merge(
-    var.tags,
-    {
-      Name = format("%s-nginx-reverse-proxy", var.name)
-    },
-  )
+    tags = merge(
+        var.tags,
+        {
+        Name = format("%s-nginx-reverse-proxy", var.name)
+        },
+    )
+}
+resource "aws_security_group_rule" "inbound-nginx-http" {
+    type                     = "ingress"
+    from_port                = 80
+    to_port                  = 80
+    protocol                 = "tcp"
+    source_security_group_id = aws_security_group.ext-alb-sg.id
+    security_group_id        = aws_security_group.nginx-sg.id
+}
+resource "aws_security_group_rule" "inbound-nginx-https" {
+    type                     = "ingress"
+    from_port                = 443
+    to_port                  = 443
+    protocol                 = "tcp"
+    source_security_group_id = aws_security_group.ext-alb-sg.id
+    security_group_id        = aws_security_group.nginx-sg.id
 }
 
