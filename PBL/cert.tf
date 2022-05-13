@@ -31,3 +31,33 @@ resource "aws_route53_record" "hracompany" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.hracompany.zone_id
 }
+
+# validate the certificate through DNS method
+resource "aws_acm_certificate_validation" "hracompany" {
+  certificate_arn         = aws_acm_certificate.hracompany.arn
+  validation_record_fqdns = [for record in aws_route53_record.hracompany : record.fqdn]
+}
+
+# create records for tooling
+resource "aws_route53_record" "tooling" {
+    zone_id = data.aws_route53_zone.hracompany.zone_id
+    name    = "tooling.hracompany.ga"
+    type    = "A"
+    alias {
+        name                   = aws_lb.ext-alb.dns_name
+        zone_id                = aws_lb.ext-alb.zone_id
+        evaluate_target_health = true
+    }
+}
+
+# create records for wordpress
+resource "aws_route53_record" "wordpress" {
+    zone_id = data.aws_route53_zone.hracompany.zone_id
+    name    = "wordpress.hracompany.ga"
+    type    = "A"
+    alias {
+        name                   = aws_lb.ext-alb.dns_name
+        zone_id                = aws_lb.ext-alb.zone_id
+        evaluate_target_health = true
+    }
+}
