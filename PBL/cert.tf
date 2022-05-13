@@ -8,11 +8,11 @@ resource "aws_acm_certificate" "hracompany" {
 resource "aws_route53_zone" "hracompany" {
   name = "hracompany.ga"
 }
-# # calling the hosted zone
-# data "aws_route53_zone" "hracompany" {
-#   name         = "hracompany.ga"
-#   private_zone = false
-# }
+# calling the hosted zone
+data "aws_route53_zone" "hracompany" {
+  name         = "hracompany.ga"
+  private_zone = false
+}
 
 # selecting validation method
 resource "aws_route53_record" "hracompany" {
