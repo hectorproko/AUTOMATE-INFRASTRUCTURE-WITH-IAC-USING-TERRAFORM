@@ -31,7 +31,7 @@ resource "aws_security_group" "ext-alb-sg" {
     )
 }
 # security group for bastion, to allow access into the bastion host from you IP
-resource "aws_security_group" "bastion_sg" {
+resource "aws_security_group" "bastion-sg" {
     name        = format("%s-bastion", var.name)
     vpc_id      = aws_vpc.main.id
     description = "Allow incoming HTTP connections."
@@ -88,7 +88,14 @@ resource "aws_security_group_rule" "inbound-nginx-https" {
     source_security_group_id = aws_security_group.ext-alb-sg.id
     security_group_id        = aws_security_group.nginx-sg.id
 }
-
+resource "aws_security_group_rule" "inbound-bastion-ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.bastion-sg.id
+  security_group_id        = aws_security_group.nginx-sg.id
+}
 # security group for ialb, to have acces only from nginx reverser proxy server
 resource "aws_security_group" "int-alb-sg" {
     name   = format("%s-int-ALB", var.name)
@@ -162,7 +169,7 @@ resource "aws_security_group_rule" "inbound-web-ssh" {
   from_port                = 22
   to_port                  = 22
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.bastion_sg.id
+  source_security_group_id = aws_security_group.bastion-sg.id
   security_group_id        = aws_security_group.webserver-sg.id
 }
 
@@ -199,7 +206,7 @@ resource "aws_security_group_rule" "inbound-mysql-bastion" {
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.bastion_sg.id
+  source_security_group_id = aws_security_group.bastion-sg.id
   security_group_id        = aws_security_group.datalayer-sg.id
 }
 #to alow mysql traffic from websever 
