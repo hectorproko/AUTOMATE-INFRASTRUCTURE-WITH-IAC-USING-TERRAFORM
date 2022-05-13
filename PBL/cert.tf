@@ -5,6 +5,9 @@ resource "aws_acm_certificate" "hracompany" {
   validation_method = "DNS"
 }
 
+resource "aws_route53_zone" "hracompany" {
+  name = "example.com"
+}
 # calling the hosted zone
 data "aws_route53_zone" "hracompany" {
   name         = "hracompany.ga"
