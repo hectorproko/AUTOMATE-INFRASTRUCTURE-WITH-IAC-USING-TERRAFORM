@@ -89,3 +89,37 @@ resource "aws_security_group_rule" "inbound-nginx-https" {
     security_group_id        = aws_security_group.nginx-sg.id
 }
 
+# security group for ialb, to have acces only from nginx reverser proxy server
+resource "aws_security_group" "int-alb-sg" {
+    name   = format("%s-int-ALB", var.name)
+    vpc_id = aws_vpc.main.id
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    tags = merge(
+        var.tags,
+        {
+            Name = format("%s-int-ALB", var.name)
+            
+        },
+    )
+}
+resource "aws_security_group_rule" "inbound-ialb-http" {
+    type                     = "ingress"
+    from_port                = 80
+    to_port                  = 80
+    protocol                 = "tcp"
+    source_security_group_id = aws_security_group.nginx-sg.id
+    security_group_id        = aws_security_group.int-alb-sg.id
+}
+resource "aws_security_group_rule" "inbound-ialb-https" {
+    type                     = "ingress"
+    from_port                = 443
+    to_port                  = 443
+    protocol                 = "tcp"
+    source_security_group_id = aws_security_group.nginx-sg.id
+    security_group_id        = aws_security_group.int-alb-sg.id
+}
