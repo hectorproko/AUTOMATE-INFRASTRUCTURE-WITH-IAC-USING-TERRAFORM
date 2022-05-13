@@ -165,3 +165,49 @@ resource "aws_security_group_rule" "inbound-web-ssh" {
   source_security_group_id = aws_security_group.bastion_sg.id
   security_group_id        = aws_security_group.webserver-sg.id
 }
+
+# security group for datalayer 
+#to alow traffic from websever on nfs and mysql port and bastiopn host on mysql port
+resource "aws_security_group" "datalayer-sg" {
+    name   = format("%s-datalayer", var.name)
+    vpc_id = aws_vpc.main.id
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    tags = merge(
+        var.tags,
+        {
+        Name = format("%s-datalayer", var.name)
+        },
+    )
+}
+#to alow nfs traffic from websever 
+resource "aws_security_group_rule" "inbound-nfs-port" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.webserver-sg.id
+  security_group_id        = aws_security_group.datalayer-sg.id
+}
+#to allow mysql traffic from bastion
+resource "aws_security_group_rule" "inbound-mysql-bastion" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.bastion_sg.id
+  security_group_id        = aws_security_group.datalayer-sg.id
+}
+#to alow mysql traffic from websever 
+resource "aws_security_group_rule" "inbound-mysql-webserver" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.webserver-sg.id
+  security_group_id        = aws_security_group.datalayer-sg.id
+}
