@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "hracompany" {
 }
 
 resource "aws_route53_zone" "hracompany" {
-  name = "example.com"
+  name = "hracompany.ga"
 }
 # calling the hosted zone
 data "aws_route53_zone" "hracompany" {
