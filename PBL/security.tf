@@ -59,12 +59,22 @@ resource "aws_security_group" "bastion_sg" {
 resource "aws_security_group" "nginx-sg" {
   name   = format("%s-nginx-reverse-proxy", var.name)
   vpc_id = aws_vpc.main.id
-egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
+    ingress {
+        description = "HTTP"
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+        source_security_group_id = aws_security_group.ext-alb-sg.id
+
+    }
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
 tags = merge(
     var.tags,
     {
