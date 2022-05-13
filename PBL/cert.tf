@@ -12,6 +12,7 @@ resource "aws_route53_zone" "hracompany" {
 data "aws_route53_zone" "hracompany" {
   name         = "hracompany.ga"
   private_zone = false
+  depends_on    = [aws_route53_zone.hracompany]
 }
 
 # selecting validation method
