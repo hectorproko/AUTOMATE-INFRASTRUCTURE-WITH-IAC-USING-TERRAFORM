@@ -19,12 +19,10 @@ resource "aws_autoscaling_notification" "hector_notifications" {
   ]
   topic_arn = aws_sns_topic.hector-sns
 }
-
 #launch template for bastion
 resource "random_shuffle" "az_list" {
   input = data.aws_availability_zones.available.names
 }
-
 resource "aws_launch_template" "bastion-launch-template" {
   image_id               = var.ami
   instance_type          = "t2.micro"
@@ -50,7 +48,6 @@ resource "aws_launch_template" "bastion-launch-template" {
   }
   user_data = filebase64("${path.module}/bastion.sh")
 }
-
 # ---- Autoscaling for bastion  hosts
 resource "aws_autoscaling_group" "bastion-asg" {
   name                      = "bastion-asg"
@@ -126,3 +123,4 @@ resource "aws_autoscaling_attachment" "asg_attachment_nginx" {
   autoscaling_group_name = aws_autoscaling_group.nginx-asg.id
   alb_target_group_arn   = aws_lb_target_group.nginx-tgt.arn
 }
+

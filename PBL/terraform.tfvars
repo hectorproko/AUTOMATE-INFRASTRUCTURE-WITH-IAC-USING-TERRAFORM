@@ -6,7 +6,7 @@ enable_classiclink = "false"
 enable_classiclink_dns_support = "false" 
 preferred_number_of_public_subnets = 2
 preferred_number_of_private_subnets = 4
-environment = "dev"
+#environment = "dev"
 ami = "ami-09e67e426f25ce0d7"
 keypair = "devops"
 
