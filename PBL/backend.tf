@@ -35,7 +35,6 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
     encrypt        = true
-    depends_on    = [aws_s3_bucket.terraform_state]
     # depends_on    = [aws_dynamodb_table.terraform_locks]
   }
 }
