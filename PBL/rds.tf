@@ -1,6 +1,6 @@
 # This section will create the subnet group for the RDS  instance using the private subnet
 resource "aws_db_subnet_group" "HRA-rds" {
-  name       = "hra-rds"
+  name       = "hra-rds" #│ Error: only lowercase alphanumeric characters, hyphens, underscores, periods, and spaces allowed in "name"
   subnet_ids = [aws_subnet.private[2].id, aws_subnet.private[3].id]
 
  tags = merge(
@@ -18,7 +18,7 @@ resource "aws_db_instance" "HRA-rds" {
   engine                 = "mysql"
   engine_version         = "5.7"
   instance_class         = "db.t2.micro"
-  name                   = "daviddb"
+  name                   = "hectordb"
   username               = var.master-username
   password               = var.master-password
   parameter_group_name   = "default.mysql5.7"
