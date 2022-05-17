@@ -3,6 +3,12 @@
 resource "aws_acm_certificate" "hracompany" {
   domain_name       = "*.hracompany.ga"
   validation_method = "DNS"
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-terraform-state", var.name)
+    },
+  )
 }
 
 resource "aws_route53_zone" "hracompany" {

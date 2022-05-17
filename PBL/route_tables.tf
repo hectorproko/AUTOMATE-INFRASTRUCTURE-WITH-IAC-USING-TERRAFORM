@@ -1,10 +1,10 @@
 # create private route table
 resource "aws_route_table" "private-rtb" {
   vpc_id = aws_vpc.main.id
-tags = merge(
+  tags = merge(
     var.tags,
     {
-      Name = format("%s-Private-Route-Table", var.name)
+      Name = format("%s-private-rtb", var.name)
     },
   )
 }
@@ -17,10 +17,10 @@ resource "aws_route_table_association" "private-subnets-assoc" {
 # create route table for the public subnets
 resource "aws_route_table" "public-rtb" {
   vpc_id = aws_vpc.main.id
-tags = merge(
+  tags = merge(
     var.tags,
     {
-      Name = format("%s-Public-Route-Table", var.name)
+      Name = format("%s-public-rtb", var.name)
     },
   )
 }

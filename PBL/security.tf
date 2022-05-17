@@ -110,7 +110,6 @@ resource "aws_security_group" "int-alb-sg" {
         var.tags,
         {
             Name = format("%s-int-ALB", var.name)
-            
         },
     )
 }
@@ -147,6 +146,7 @@ resource "aws_security_group" "webserver-sg" {
         Name = format("%s-webserver", var.name)
         },
     )
+
 }
 resource "aws_security_group_rule" "inbound-web-http" {
   type                     = "ingress"
@@ -187,7 +187,7 @@ resource "aws_security_group" "datalayer-sg" {
     tags = merge(
         var.tags,
         {
-        Name = format("%s-datalayer", var.name)
+            Name = format("%s-datalayer", var.name)
         },
     )
 }

@@ -13,6 +13,12 @@ resource "aws_s3_bucket" "terraform_state" {
       }
     }
   }
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-terraform-state", var.name)
+    },
+  )
 }
 
 #2 Dynamo DB resource for locking and consistency checking:
@@ -24,6 +30,12 @@ resource "aws_dynamodb_table" "terraform_locks" {
     name = "LockID"
     type = "S"
   }
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-terraform-locks", var.name)
+    },
+  )
 }
 
 #Terraform expects that both S3 bucket and DynamoDB resources are already created before we configure the backend. So, let us run terraform apply to provision resources.

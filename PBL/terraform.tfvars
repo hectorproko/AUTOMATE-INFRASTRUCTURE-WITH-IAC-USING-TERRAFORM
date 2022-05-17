@@ -10,10 +10,10 @@ preferred_number_of_private_subnets = 4
 ami = "ami-09e67e426f25ce0d7"
 keypair = "devops"
 
-#master-password = "devopspblproject"
-#master-username = "david"
+master-password = "12345"
+master-username = "hector"
 # Ensure to this change to your accounbt number
-#account_no = "123456789"
+account_no = "199055125796"
 
 tags = {
   Enviroment      = "development" 

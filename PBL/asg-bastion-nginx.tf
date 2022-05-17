@@ -1,6 +1,6 @@
 #### creating sns topic for all the auto scaling groups
 resource "aws_sns_topic" "hector-sns" {
-name = "Default_CloudWatch_Alarms_Topic"
+  name = "Default_CloudWatch_Alarms_Topic"
 }
 
 #creating notification for all the auto scaling groups
@@ -42,7 +42,7 @@ resource "aws_launch_template" "bastion-launch-template" {
   tags = merge(
     var.tags,
     {
-      Name = "bastion-launch-template"
+      Name = format("%s-bastion-template", var.name)
     },
   )
   }
@@ -50,7 +50,7 @@ resource "aws_launch_template" "bastion-launch-template" {
 }
 # ---- Autoscaling for bastion  hosts
 resource "aws_autoscaling_group" "bastion-asg" {
-  name                      = "bastion-asg"
+  name                      = format("%s-bastion", var.name)
   max_size                  = 2
   min_size                  = 1
   health_check_grace_period = 300
@@ -66,7 +66,7 @@ resource "aws_autoscaling_group" "bastion-asg" {
   }
   tag {
     key                 = "Name"
-    value               = "bastion-launch-template"
+    value               = format("%s-bastion-template", var.name)
     propagate_at_launch = true
   }
 }
@@ -90,7 +90,7 @@ resource "aws_launch_template" "nginx-launch-template" {
   tags = merge(
     var.tags,
     {
-      Name = "nginx-launch-template"
+      Name = format("%s-nginx-template", var.name)
     },
   )
   }
@@ -98,7 +98,7 @@ resource "aws_launch_template" "nginx-launch-template" {
 }
 # ------ Autoscslaling group for reverse proxy nginx ---------
 resource "aws_autoscaling_group" "nginx-asg" {
-  name                      = "nginx-asg"
+  name                      = format("%s-nginx", var.name)
   max_size                  = 2
   min_size                  = 1
   health_check_grace_period = 300
@@ -114,7 +114,7 @@ resource "aws_autoscaling_group" "nginx-asg" {
   }
   tag {
     key                 = "Name"
-    value               = "nginx-launch-template"
+    value               = format("%s-nginx", var.name)
     propagate_at_launch = true
   }
 }

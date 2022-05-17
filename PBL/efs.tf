@@ -1,5 +1,5 @@
 # create key from key management system
-resource "aws_kms_key" "ACS-kms" {
+resource "aws_kms_key" "HRA-kms" {
   description = "KMS key "
   policy      = <<EOF
   {
@@ -21,39 +21,39 @@ EOF
 # create key alias
 resource "aws_kms_alias" "alias" {
   name          = "alias/kms"
-  target_key_id = aws_kms_key.ACS-kms.key_id
+  target_key_id = aws_kms_key.HRA-kms.key_id
 }
 
 # create Elastic file system
-resource "aws_efs_file_system" "ACS-efs" {
+resource "aws_efs_file_system" "HRA-efs" {
   encrypted  = true
-  kms_key_id = aws_kms_key.ACS-kms.arn
+  kms_key_id = aws_kms_key.HRA-kms.arn
 
   tags = merge(
     var.tags,
     {
-      Name = "ACS-efs"
+      Name = format("%s-filesystem", var.name) 
     },
   )
 }
 
 # set first mount target for the EFS 
 resource "aws_efs_mount_target" "subnet-1" {
-  file_system_id  = aws_efs_file_system.ACS-efs.id
+  file_system_id  = aws_efs_file_system.HRA-efs.id
   subnet_id       = aws_subnet.private[2].id
   security_groups = [aws_security_group.datalayer-sg.id]
 }
 
 # set second mount target for the EFS 
 resource "aws_efs_mount_target" "subnet-2" {
-  file_system_id  = aws_efs_file_system.ACS-efs.id
+  file_system_id  = aws_efs_file_system.HRA-efs.id
   subnet_id       = aws_subnet.private[3].id
   security_groups = [aws_security_group.datalayer-sg.id]
 }
 
 # create access point for wordpress
 resource "aws_efs_access_point" "wordpress" {
-  file_system_id = aws_efs_file_system.ACS-efs.id
+  file_system_id = aws_efs_file_system.HRA-efs.id
 
   posix_user {
     gid = 0
@@ -70,12 +70,17 @@ resource "aws_efs_access_point" "wordpress" {
     }
 
   }
-
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-wordpress-ap", var.name) 
+    },
+  )
 }
 
 # create access point for tooling
 resource "aws_efs_access_point" "tooling" {
-  file_system_id = aws_efs_file_system.ACS-efs.id
+  file_system_id = aws_efs_file_system.HRA-efs.id
   posix_user {
     gid = 0
     uid = 0
@@ -92,4 +97,10 @@ resource "aws_efs_access_point" "tooling" {
     }
 
   }
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-tooling-ap", var.name) 
+    },
+  )
 }

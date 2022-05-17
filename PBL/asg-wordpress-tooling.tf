@@ -25,7 +25,7 @@ resource "aws_launch_template" "wordpress-launch-template" {
     tags = merge(
     var.tags,
     {
-      Name = "wordpress-launch-template"
+      Name = format("%s-wordpress-template", var.name) 
     },
   )
 
@@ -37,7 +37,7 @@ resource "aws_launch_template" "wordpress-launch-template" {
 # ---- Autoscaling for wordpress application
 
 resource "aws_autoscaling_group" "wordpress-asg" {
-  name                      = "wordpress-asg"
+  name                      = format("%s-wordpress", var.name)
   max_size                  = 2
   min_size                  = 1
   health_check_grace_period = 300
@@ -55,7 +55,7 @@ resource "aws_autoscaling_group" "wordpress-asg" {
   }
   tag {
     key                 = "Name"
-    value               = "wordpress-asg"
+    value               = format("%s-wordpress", var.name)
     propagate_at_launch = true
   }
 }
@@ -92,7 +92,7 @@ resource "aws_launch_template" "tooling-launch-template" {
   tags = merge(
     var.tags,
     {
-      Name = "tooling-launch-template"
+      Name = format("%s-tooling-template", var.name) 
     },
   )
 
@@ -104,7 +104,7 @@ resource "aws_launch_template" "tooling-launch-template" {
 # ---- Autoscaling for tooling -----
 
 resource "aws_autoscaling_group" "tooling-asg" {
-  name                      = "tooling-asg"
+  name                      = format("%s-tooling", var.name)
   max_size                  = 2
   min_size                  = 1
   health_check_grace_period = 300
@@ -124,7 +124,7 @@ resource "aws_autoscaling_group" "tooling-asg" {
 
   tag {
     key                 = "Name"
-    value               = "tooling-launch-template"
+    value               = format("%s-tooling", var.name)
     propagate_at_launch = true
   }
 }

@@ -1,6 +1,6 @@
 #External Load Balancer
 resource "aws_lb" "ext-alb" {
-    name     = "ext-alb"
+    name     = format("%s-ext-ALB", var.name)
     internal = false
     security_groups = [
     aws_security_group.ext-alb-sg.id,
@@ -12,7 +12,7 @@ resource "aws_lb" "ext-alb" {
     tags = merge(
         var.tags,
         {
-            Name = "ACS-ext-alb"
+            Name = format("%s-ext-ALB", var.name)
         },
     )
     ip_address_type    = "ipv4"
@@ -28,11 +28,17 @@ resource "aws_lb_target_group" "nginx-tgt" {
         healthy_threshold   = 5
         unhealthy_threshold = 2
     }
-    name        = "nginx-tgt"
+    name        = format("%s-nginx-target", var.name) 
     port        = 443
     protocol    = "HTTPS"
     target_type = "instance"
     vpc_id      = aws_vpc.main.id
+    tags = merge(
+        var.tags,
+        {
+            Name = format("%s-nginx-target", var.name) 
+        },
+    )
 }
 
 resource "aws_lb_listener" "nginx-listner" {
@@ -51,7 +57,7 @@ resource "aws_lb_listener" "nginx-listner" {
 ####### Internal Load Balancers #######
 # for webserrvers
 resource "aws_lb" "ialb" {
-  name     = "ialb"
+  name     = format("%s-int-ALB", var.name) 
   internal = true
   security_groups = [
     aws_security_group.int-alb-sg.id,
@@ -63,7 +69,7 @@ resource "aws_lb" "ialb" {
   tags = merge(
     var.tags,
     {
-      Name = "ACS-int-alb"
+      Name = format("%s-int-ALB", var.name)
     },
   )
   ip_address_type    = "ipv4"
@@ -80,11 +86,17 @@ resource "aws_lb_target_group" "wordpress-tgt" {
     healthy_threshold   = 5
     unhealthy_threshold = 2
   }
-  name        = "wordpress-tgt"
+  name        = format("%s-wordpress-target", var.name)
   port        = 443
   protocol    = "HTTPS"
   target_type = "instance"
   vpc_id      = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-wordpress-target", var.name)
+    },
+  )
 }
 # --- target group for tooling -------
 resource "aws_lb_target_group" "tooling-tgt" {
@@ -96,11 +108,17 @@ resource "aws_lb_target_group" "tooling-tgt" {
     healthy_threshold   = 5
     unhealthy_threshold = 2
   }
-  name        = "tooling-tgt"
+  name        = format("%s-tooling-target", var.name)
   port        = 443
   protocol    = "HTTPS"
   target_type = "instance"
   vpc_id      = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    {
+      Name = format("%s-tooling-target", var.name)
+    },
+  )
 }
 
 # For this aspect a single listener was created for the wordpress which is default,
