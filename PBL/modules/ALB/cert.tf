@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "hracompany" {
   tags = merge(
     var.tags,
     {
-      Name = format("%s-terraform-state", var.name)
+      Name = format("%s-Cert", var.name)
     },
   )
 }
@@ -14,6 +14,7 @@ resource "aws_acm_certificate" "hracompany" {
 resource "aws_route53_zone" "hracompany" {
   name = "hracompany.ga"
 }
+
 # calling the hosted zone
 data "aws_route53_zone" "hracompany" {
   name         = "hracompany.ga"

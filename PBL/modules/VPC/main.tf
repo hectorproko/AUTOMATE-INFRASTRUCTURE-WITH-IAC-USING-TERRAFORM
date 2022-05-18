@@ -3,10 +3,6 @@ data "aws_availability_zones" "available" {
     state = "available"
 }
 
-provider "aws" {
-    region = var.region
-}
-
 # Create VPC
 resource "aws_vpc" "main" {
   cidr_block                     = var.vpc_cidr

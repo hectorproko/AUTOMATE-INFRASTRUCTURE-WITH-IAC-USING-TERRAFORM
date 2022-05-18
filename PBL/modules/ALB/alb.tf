@@ -1,24 +1,26 @@
-#External Load Balancer
+#External Load Balancer for reverse proxy nginx
 resource "aws_lb" "ext-alb" {
-    name     = format("%s-ext-ALB", var.name)
+    name     = format("%s-ext-ALB", var.name) #<<<
     internal = false
-    security_groups = [
-    aws_security_group.ext-alb-sg.id,
-    ]
-    subnets = [
-    aws_subnet.public[0].id,
-    aws_subnet.public[1].id
-    ]
+    #security_groups = [aws_security_group.ext-alb-sg.id,]
+    security_groups = [var.public-sg]
+
+    #subnets = [aws_subnet.public[0].id,aws_subnet.public[1].id]
+    subnets = [var.public-sbn-1,var.public-sbn-2, ]
+
     tags = merge(
         var.tags,
         {
             Name = format("%s-ext-ALB", var.name)
         },
     )
-    ip_address_type    = "ipv4"
-    load_balancer_type = "application"
+    #ip_address_type    = "ipv4"
+    ip_address_type    = var.ip_address_type
+    #load_balancer_type = "application"
+    load_balancer_type = var.load_balancer_type
 }
-
+#--- create a target group for the external load balancer
+# Could turn all hardcoded attributes to variables
 resource "aws_lb_target_group" "nginx-tgt" {
     health_check {
         interval            = 10
@@ -32,7 +34,8 @@ resource "aws_lb_target_group" "nginx-tgt" {
     port        = 443
     protocol    = "HTTPS"
     target_type = "instance"
-    vpc_id      = aws_vpc.main.id
+    #vpc_id      = aws_vpc.main.id
+    vpc_id      = var.vpc_id
     tags = merge(
         var.tags,
         {
@@ -40,7 +43,7 @@ resource "aws_lb_target_group" "nginx-tgt" {
         },
     )
 }
-
+#create a listener for the load balancer
 resource "aws_lb_listener" "nginx-listner" {
     load_balancer_arn = aws_lb.ext-alb.arn
     port              = 443
@@ -59,21 +62,22 @@ resource "aws_lb_listener" "nginx-listner" {
 resource "aws_lb" "ialb" {
   name     = format("%s-int-ALB", var.name) 
   internal = true
-  security_groups = [
-    aws_security_group.int-alb-sg.id,
-  ]
-  subnets = [
-    aws_subnet.private[0].id,
-    aws_subnet.private[1].id
-  ]
+  #security_groups = [aws_security_group.int-alb-sg.id,]
+  security_groups = [var.private-sg]
+
+  #subnets = [aws_subnet.private[0].id, aws_subnet.private[1].id]
+  subnets = [var.private-sbn-1, var.private-sbn-2,]
+  
   tags = merge(
     var.tags,
     {
       Name = format("%s-int-ALB", var.name)
     },
   )
-  ip_address_type    = "ipv4"
-  load_balancer_type = "application"
+  #ip_address_type    = "ipv4"
+  ip_address_type    = var.ip_address_type
+  #load_balancer_type = "application"
+  load_balancer_type = var.load_balancer_type
 }
 
 # --- target group  for wordpress -------
@@ -90,7 +94,8 @@ resource "aws_lb_target_group" "wordpress-tgt" {
   port        = 443
   protocol    = "HTTPS"
   target_type = "instance"
-  vpc_id      = aws_vpc.main.id
+  #vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
   tags = merge(
     var.tags,
     {
@@ -112,7 +117,8 @@ resource "aws_lb_target_group" "tooling-tgt" {
   port        = 443
   protocol    = "HTTPS"
   target_type = "instance"
-  vpc_id      = aws_vpc.main.id
+  #vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
   tags = merge(
     var.tags,
     {
@@ -144,7 +150,7 @@ resource "aws_lb_listener_rule" "tooling-listener" {
   }
   condition {
     host_header {
-      values = ["tooling.hracompany.gq"]
+      values = ["tooling.hracompany.ga"]
     }
   }
 }
