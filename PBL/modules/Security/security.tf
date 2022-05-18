@@ -1,220 +1,34 @@
-# security group for alb, to allow acess from any where for HTTP and HTTPS traffic
-resource "aws_security_group" "ext-alb-sg" {
-    name        = format("%s-ext-ALB", var.name)
-    vpc_id      = aws_vpc.main.id
-    description = "Allow TLS inbound traffic"
-    ingress {
-        description = "HTTP"
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+# creating dynamic ingress security groups
+locals {
+  security_groups = {
+    ext-alb-sg = {
+      name        = format("%s-ext-ALB", var.name)
+      description = "for external loadbalncer"
     }
-    ingress {
-        description = "HTTPS"
-        from_port   = 443
-        to_port     = 443
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+    # security group for bastion
+    bastion-sg = {
+      name        = format("%s-bastion", var.name)
+      description = "for bastion instances"
     }
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+    # security group for nginx
+    nginx-sg = {
+      name        = format("%s-nginx-reverse-proxy", var.name)
+      description = "nginx instances"
     }
-    tags = merge(
-        var.tags,
-        {
-            Name = format("%s-ext-ALB", var.name)
-        },
-    )
-}
-# security group for bastion, to allow access into the bastion host from you IP
-resource "aws_security_group" "bastion-sg" {
-    name        = format("%s-bastion", var.name)
-    vpc_id      = aws_vpc.main.id
-    description = "Allow incoming HTTP connections."
-    ingress {
-        description = "SSH"
-        from_port   = 22
-        to_port     = 22
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+    # security group for IALB
+    int-alb-sg = {
+      name        = format("%s-int-ALB", var.name)
+      description = "IALB security group"
     }
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+    # security group for webservers
+    webserver-sg = {
+      name        = format("%s-webserver", var.name)
+      description = "webservers security group"
     }
-    tags = merge(
-    var.tags,
-        {
-            Name = format("%s-bastion", var.name)   
-        },
-    )
-}
-#security group for nginx reverse proxy, to allow access only from the extaernal load balancer and bastion instance
-resource "aws_security_group" "nginx-sg" {
-  name   = format("%s-nginx-reverse-proxy", var.name)
-  vpc_id = aws_vpc.main.id
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+    # security group for data-layer
+    datalayer-sg = {
+      name        = format("%s-datalayer", var.name)
+      description = "data layer security group"
     }
-    tags = merge(
-        var.tags,
-        {
-        Name = format("%s-nginx-reverse-proxy", var.name)
-        },
-    )
-}
-resource "aws_security_group_rule" "inbound-nginx-http" {
-    type                     = "ingress"
-    from_port                = 80
-    to_port                  = 80
-    protocol                 = "tcp"
-    source_security_group_id = aws_security_group.ext-alb-sg.id
-    security_group_id        = aws_security_group.nginx-sg.id
-}
-resource "aws_security_group_rule" "inbound-nginx-https" {
-    type                     = "ingress"
-    from_port                = 443
-    to_port                  = 443
-    protocol                 = "tcp"
-    source_security_group_id = aws_security_group.ext-alb-sg.id
-    security_group_id        = aws_security_group.nginx-sg.id
-}
-resource "aws_security_group_rule" "inbound-bastion-ssh" {
-  type                     = "ingress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.bastion-sg.id
-  security_group_id        = aws_security_group.nginx-sg.id
-}
-# security group for ialb, to have acces only from nginx reverser proxy server
-resource "aws_security_group" "int-alb-sg" {
-    name   = format("%s-int-ALB", var.name)
-    vpc_id = aws_vpc.main.id
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    tags = merge(
-        var.tags,
-        {
-            Name = format("%s-int-ALB", var.name)
-        },
-    )
-}
-resource "aws_security_group_rule" "inbound-ialb-http" {
-    type                     = "ingress"
-    from_port                = 80
-    to_port                  = 80
-    protocol                 = "tcp"
-    source_security_group_id = aws_security_group.nginx-sg.id
-    security_group_id        = aws_security_group.int-alb-sg.id
-}
-resource "aws_security_group_rule" "inbound-ialb-https" {
-    type                     = "ingress"
-    from_port                = 443
-    to_port                  = 443
-    protocol                 = "tcp"
-    source_security_group_id = aws_security_group.nginx-sg.id
-    security_group_id        = aws_security_group.int-alb-sg.id
-}
-
-# security group for webservers, to have access only from the internal load balancer and bastion instance
-resource "aws_security_group" "webserver-sg" {
-  name   = format("%s-webserver", var.name)
-  vpc_id = aws_vpc.main.id
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    tags = merge(
-        var.tags,
-        {
-        Name = format("%s-webserver", var.name)
-        },
-    )
-
-}
-resource "aws_security_group_rule" "inbound-web-http" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.int-alb-sg.id
-  security_group_id        = aws_security_group.webserver-sg.id
-}
-resource "aws_security_group_rule" "inbound-web-https" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.int-alb-sg.id
-  security_group_id        = aws_security_group.webserver-sg.id
-}
-resource "aws_security_group_rule" "inbound-web-ssh" {
-  type                     = "ingress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.bastion-sg.id
-  security_group_id        = aws_security_group.webserver-sg.id
-}
-
-# security group for datalayer 
-#to alow traffic from websever on nfs and mysql port and bastiopn host on mysql port
-resource "aws_security_group" "datalayer-sg" {
-    name   = format("%s-datalayer", var.name)
-    vpc_id = aws_vpc.main.id
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    tags = merge(
-        var.tags,
-        {
-            Name = format("%s-datalayer", var.name)
-        },
-    )
-}
-#to alow nfs traffic from websever 
-resource "aws_security_group_rule" "inbound-nfs-port" {
-  type                     = "ingress"
-  from_port                = 2049
-  to_port                  = 2049
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.webserver-sg.id
-  security_group_id        = aws_security_group.datalayer-sg.id
-}
-#to allow mysql traffic from bastion
-resource "aws_security_group_rule" "inbound-mysql-bastion" {
-  type                     = "ingress"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.bastion-sg.id
-  security_group_id        = aws_security_group.datalayer-sg.id
-}
-#to alow mysql traffic from websever 
-resource "aws_security_group_rule" "inbound-mysql-webserver" {
-  type                     = "ingress"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.webserver-sg.id
-  security_group_id        = aws_security_group.datalayer-sg.id
+  }
 }
