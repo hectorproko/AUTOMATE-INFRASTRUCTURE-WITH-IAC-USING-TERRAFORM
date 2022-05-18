@@ -1,4 +1,7 @@
-#### creating sns topic for all the auto scaling groups
+# Get list of availability zones
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 resource "aws_sns_topic" "hector-sns" {
   name = "Default_CloudWatch_Alarms_Topic"
 }
@@ -23,79 +26,29 @@ resource "aws_autoscaling_notification" "hector_notifications" {
 resource "random_shuffle" "az_list" {
   input = data.aws_availability_zones.available.names
 }
-resource "aws_launch_template" "bastion-launch-template" {
-  image_id               = var.ami
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.bastion-sg.id]
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ip.id
-  }
-  key_name = var.keypair
-  placement {
-    availability_zone = "random_shuffle.az_list.result"
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-  tag_specifications {
-    resource_type = "instance"
-  tags = merge(
-    var.tags,
-    {
-      Name = format("%s-bastion-template", var.name)
-    },
-  )
-  }
-  #user_data = filebase64("${path.module}/bastion.sh")
-}
+
 # ---- Autoscaling for bastion  hosts
 resource "aws_autoscaling_group" "bastion-asg" {
   name                      = format("%s-bastion", var.name)
-  max_size                  = 2
-  min_size                  = 1
+  max_size                  = var.max_size
+  min_size                  = var.min_size
   health_check_grace_period = 300
   health_check_type         = "ELB"
-  desired_capacity          = 1
-  vpc_zone_identifier = [
-    aws_subnet.public[0].id,
-    aws_subnet.public[1].id
-  ]
+  desired_capacity          = var.desired_capacity
+  #vpc_zone_identifier = [aws_subnet.public[0].id, aws_subnet.public[1].id]
+  vpc_zone_identifier = var.public_subnets
+
   launch_template {
     id      = aws_launch_template.bastion-launch-template.id
     version = "$Latest"
   }
   tag {
     key                 = "Name"
-    value               = format("%s-bastion-template", var.name)
+    value               = format("%s-bastion", var.name)
     propagate_at_launch = true
   }
 }
-# launch template for nginx
-resource "aws_launch_template" "nginx-launch-template" {
-  image_id               = var.ami
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.nginx-sg.id]
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ip.id
-  }
-  key_name =  var.keypair
-  placement {
-    availability_zone = "random_shuffle.az_list.result"
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-  tag_specifications {
-    resource_type = "instance"
-  tags = merge(
-    var.tags,
-    {
-      Name = format("%s-nginx-template", var.name)
-    },
-  )
-  }
-  #user_data = filebase64("${path.module}/nginx.sh")
-}
+
 # ------ Autoscslaling group for reverse proxy nginx ---------
 resource "aws_autoscaling_group" "nginx-asg" {
   name                      = format("%s-nginx", var.name)
@@ -104,10 +57,9 @@ resource "aws_autoscaling_group" "nginx-asg" {
   health_check_grace_period = 300
   health_check_type         = "ELB"
   desired_capacity          = 1
-  vpc_zone_identifier = [
-    aws_subnet.public[0].id,
-    aws_subnet.public[1].id
-  ]
+  # vpc_zone_identifier = [aws_subnet.public[0].id, aws_subnet.public[1].id]
+  vpc_zone_identifier = var.public_subnets
+
   launch_template {
     id      = aws_launch_template.nginx-launch-template.id
     version = "$Latest"
@@ -121,6 +73,8 @@ resource "aws_autoscaling_group" "nginx-asg" {
 # attaching autoscaling group of nginx to external load balancer
 resource "aws_autoscaling_attachment" "asg_attachment_nginx" {
   autoscaling_group_name = aws_autoscaling_group.nginx-asg.id
-  alb_target_group_arn   = aws_lb_target_group.nginx-tgt.arn
+  alb_target_group_arn   = var.nginx-alb-tgt
+  #alb_target_group_arn   = aws_lb_target_group.nginx-tgt.arn
 }
+
 
