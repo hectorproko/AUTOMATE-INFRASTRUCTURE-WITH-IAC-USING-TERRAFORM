@@ -1,5 +1,5 @@
 output "ALB-sg" {
-  value = aws_security_group.HRA[format("%s-ext-ALB", var.name)].id
+  value = aws_security_group.HRA["${var.name}-ext-ALB"].id
 }
 
 
