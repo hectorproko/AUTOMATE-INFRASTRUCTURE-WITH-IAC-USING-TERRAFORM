@@ -15,7 +15,7 @@ output "bastion-sg" {
 
 
 output "nginx-sg" {
-  value = aws_security_group.HRA[format("nginx-sg", var.name)].id
+  value = aws_security_group.HRA[format("nginx-sg")].id
 }
 
 
