@@ -1,6 +1,6 @@
 output "ALB-sg" {
 #   value = aws_security_group.HRA["${var.name}-ext-ALB"].id
-  value = aws_security_group.HRA["var_name"].id
+  value = aws_security_group.HRA["HRA-ext-ALB"].id
 }
 
 
