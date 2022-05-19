@@ -28,4 +28,5 @@ resource "aws_db_instance" "HRA-rds" {
   #vpc_security_group_ids = [aws_security_group.datalayer-sg.id]
   vpc_security_group_ids = var.db-sg
   multi_az               = "true"
+  depends_on = [aws_db_subnet_group.HRA-rds]
 }
