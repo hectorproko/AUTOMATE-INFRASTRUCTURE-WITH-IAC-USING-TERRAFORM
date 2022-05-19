@@ -10,8 +10,8 @@ preferred_number_of_private_subnets = 4
 ami = "ami-09e67e426f25ce0d7"
 keypair = "devops"
 
-master-password = "12345"
-master-username = "Hect0rRodriguez!"
+master-password = "Hect0rRodriguez!"
+master-username = "Hector"
 # Ensure to this change to your accounbt number
 account_no = "199055125796"
 
