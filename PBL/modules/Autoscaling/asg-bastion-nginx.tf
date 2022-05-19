@@ -20,7 +20,7 @@ resource "aws_autoscaling_notification" "hector_notifications" {
     "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
     "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
   ]
-  topic_arn = aws_sns_topic.hector-sns.name
+  topic_arn = aws_sns_topic.hector-sns.arn
 }
 #launch template for bastion
 resource "random_shuffle" "az_list" {
