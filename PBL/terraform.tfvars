@@ -11,7 +11,7 @@ ami = "ami-09e67e426f25ce0d7"
 keypair = "devops"
 
 master-password = "12345"
-master-username = "hector"
+master-username = "Hect0rRodriguez!"
 # Ensure to this change to your accounbt number
 account_no = "199055125796"
 
