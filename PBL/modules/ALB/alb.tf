@@ -146,7 +146,7 @@ resource "aws_lb_listener" "web-listener" {
 resource "aws_lb_listener_rule" "tooling-listener" {
   listener_arn = aws_lb_listener.web-listener.arn
   priority     = 99
-  depends_on = [aaws_lb_target_group.tooling-tgt]
+  depends_on = [aws_lb_target_group.tooling-tgt]
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tooling-tgt.arn
