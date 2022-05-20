@@ -9,6 +9,7 @@ preferred_number_of_private_subnets = 4
 #environment = "dev"
 ami = "ami-09e67e426f25ce0d7"
 keypair = "devops"
+name = "HRA"
 
 master-password = "Hect0rRodriguez!"
 master-username = "Hector"
