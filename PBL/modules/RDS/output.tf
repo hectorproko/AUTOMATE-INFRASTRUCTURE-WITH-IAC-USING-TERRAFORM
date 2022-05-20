@@ -10,4 +10,3 @@ output "rds-test2" {
 # address - The hostname of the RDS instance. See also endpoint and port.
 # endpoint - The connection endpoint in address:port format.
 
-
