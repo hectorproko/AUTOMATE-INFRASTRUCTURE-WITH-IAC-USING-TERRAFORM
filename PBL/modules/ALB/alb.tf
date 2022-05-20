@@ -60,7 +60,7 @@ resource "aws_lb_listener" "nginx-listner" {
 ####### Internal Load Balancers #######
 # for webserrvers
 resource "aws_lb" "ialb" {
-  name     = format("%s-int-ALB", var.name) 
+  name     = "HRA-int-ALB"#format("%s-int-ALB", var.name) 
   internal = true
   #security_groups = [aws_security_group.int-alb-sg.id,]
   security_groups = [var.private-sg]
@@ -71,7 +71,7 @@ resource "aws_lb" "ialb" {
   tags = merge(
     var.tags,
     {
-      Name = format("%s-int-ALB", var.name)
+      Name = "HRA-int-ALB"
     },
   )
   #ip_address_type    = "ipv4"
